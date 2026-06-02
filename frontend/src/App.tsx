@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ingestVideos, getVideos, VideoMeta } from "./api/client";
 import VideoCard from "./components/VideoCard";
 import ChatPanel from "./components/ChatPanel";
