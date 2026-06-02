@@ -1,8 +1,4 @@
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
 import os
-import chromadb
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -11,12 +7,16 @@ _embeddings = None
 def get_embeddings():
     global _embeddings
     if _embeddings is None:
+        from langchain_community.embeddings import HuggingFaceEmbeddings
         _embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
     return _embeddings
 
 CHROMA_DIR = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
 
 def chunk_and_embed(video_data: dict, label: str) -> int:
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    from langchain_community.vectorstores import Chroma
+
     # Build full_text from transcript
     full_text = " ".join([t["text"] for t in video_data["transcript"]])
     
@@ -60,6 +60,7 @@ def chunk_and_embed(video_data: dict, label: str) -> int:
     return len(chunks)
 
 def get_retriever():
+    from langchain_community.vectorstores import Chroma
     db = Chroma(
         collection_name="video_transcripts",
         embedding_function=get_embeddings(),
@@ -68,6 +69,7 @@ def get_retriever():
     return db.as_retriever(search_kwargs={"k": 4})
 
 def clear_collection():
+    import chromadb
     client = chromadb.PersistentClient(path=CHROMA_DIR)
     try:
         client.delete_collection(name="video_transcripts")

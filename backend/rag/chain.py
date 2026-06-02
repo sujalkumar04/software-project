@@ -1,19 +1,19 @@
-from langchain_groq import ChatGroq
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
-from vectorstore.embedder import get_retriever
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
-
 _chain = None
 
-def get_chain() -> ConversationalRetrievalChain:
+def get_chain():
     global _chain
     if _chain is not None:
         return _chain
+
+    from langchain_groq import ChatGroq
+    from langchain.chains import ConversationalRetrievalChain
+    from langchain.memory import ConversationBufferMemory
+    from vectorstore.embedder import get_retriever
+    from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
     llm = ChatGroq(
         model="llama-3.3-70b-versatile",
