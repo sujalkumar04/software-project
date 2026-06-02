@@ -21,10 +21,6 @@ class ChatRequest(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.videos = {"A": None, "B": None}
-    try:
-        rag_chain.get_chain()
-    except Exception:
-        pass
     yield
 
 app = FastAPI(lifespan=lifespan)

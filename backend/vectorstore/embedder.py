@@ -6,7 +6,14 @@ import chromadb
 from dotenv import load_dotenv
 load_dotenv()
 
-embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
+_embeddings = None
+
+def get_embeddings():
+    global _embeddings
+    if _embeddings is None:
+        _embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
+    return _embeddings
+
 CHROMA_DIR = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
 
 def chunk_and_embed(video_data: dict, label: str) -> int:
@@ -46,7 +53,7 @@ def chunk_and_embed(video_data: dict, label: str) -> int:
         
     db = Chroma(
         collection_name="video_transcripts",
-        embedding_function=embeddings,
+        embedding_function=get_embeddings(),
         persist_directory=CHROMA_DIR
     )
     db.add_texts(texts=chunks, metadatas=metadatas, ids=ids)
@@ -55,7 +62,7 @@ def chunk_and_embed(video_data: dict, label: str) -> int:
 def get_retriever():
     db = Chroma(
         collection_name="video_transcripts",
-        embedding_function=embeddings,
+        embedding_function=get_embeddings(),
         persist_directory=CHROMA_DIR
     )
     return db.as_retriever(search_kwargs={"k": 4})
